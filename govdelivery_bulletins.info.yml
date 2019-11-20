@@ -1,0 +1,5 @@
+name: GovDelivery Bulletins
+description: Provides service and queue for sending bulletins using GovDelivery Bulletins API.
+package: API
+type: module
+core: 8.x
