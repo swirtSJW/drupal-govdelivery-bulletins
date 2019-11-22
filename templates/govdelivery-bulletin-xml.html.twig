@@ -1,0 +1,51 @@
+<bulletin>
+  <header>{{ header }}</header>
+
+  {% if from_address is not empty %}
+    <from_address_id>{{ from_address }}</from_address_id>
+  {% endif %}
+
+  <subject>{{ subject }}</subject>
+
+  {% if body is not empty %}
+    <body>
+      <![CDATA[ {{ body }} }}]]>
+    </body>
+  {% endif %}
+
+  <footer>{{ footer }}</footer>
+
+  {% if sms_body is not empty %}
+    <sms_body>{{ sms_body }}</sms_body>
+  {% else %}
+    <sms_body nil='true'></sms_body>
+  {% endif %}
+
+  <publish_rss type='boolean'>{{ (publish_rss is not empty) ? 'true' : 'false' }}</publish_rss>
+  <open_tracking type='boolean'>{{ (open_tracking is not empty) ? 'true' : 'false' }}</open_tracking>
+  <click_tracking type='boolean'>{{ (click_tracking is not empty) ? 'true' : 'false' }}</click_tracking>
+
+  {% if sms_body is not empty %}
+    <send_time>{{ send_time }}</send_time>
+  {% endif %}
+  <urgent type='boolean'>{{ (urgent is not empty) ? 'true' : 'false' }}</urgent>
+
+  <share_content_enabled type='boolean'>{{ (share_content_enabled is not empty) ? 'true' : 'false' }}</share_content_enabled>
+
+  <topics type='array'>
+    {% for topic in topics %}
+      <topic>
+        <code>{{ topic }}</code>
+      </topic>
+    {% endfor %}
+  </topics>
+
+  <categories type='array'>
+    {% for category in categories %}
+      <category>
+        <code>{{ category }}</code>
+      </category>
+    {% endfor %}
+  </categories>
+
+</bulletin>

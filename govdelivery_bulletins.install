@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Install and update hooks for govdelivery_bulletins module.
+ */
+
+use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\Queue\QueueInterface;
+
+/**
+ * Implements hook_delete().
+ */
+function govdelivery_bulletins_delete() {
+  // @TODO There should be a queue worker here that just deletes all
+  // govdelivery_bulletins from the queue.
+}

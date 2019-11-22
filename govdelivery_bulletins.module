@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * @file
+ * Module hooks for govdelivery_bulletins module.
+ */
+
+/**
+ * Implements hook_twig_theme().
+ */
+function govdelivery_bulletins_twig_theme($existing, $type, $theme, $path) {
+  $bulletin_variables = [
+    'body' => '',
+    'click_tracking' => FALSE,
+    'header' => '',
+    'from_address' => '',
+    'open_tracking' => FALSE,
+    'publish_rss' => FALSE,
+    'send_time' => '',
+    'subject' => '',
+    'footer' => '',
+    'sms_body' => '',
+    'urgent' => FALSE,
+    'share_content_enabled' => FALSE,
+    'categories' => [],
+    'topics' => [],
+  ];
+
+  return [
+    'govdelivery_bulletin_xml' => [
+      'variables' => $bulletin_variables,
+    ],
+    'govdelivey_bulletin_test_xml' => [
+      'variables' => ['email_addresses' => []],
+    ],
+  ];
+}
