@@ -1,0 +1,5 @@
+services:
+  govdelivery_bulletins.add_bulletin_to_queue:
+    class: Drupal\govdelivery_bulletins\Service\AddBulletinToQueue
+    # @TODO align arguments with need.
+    arguments: ['@entity_type.manager', '@logger.factory']
