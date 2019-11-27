@@ -172,7 +172,7 @@ class AddBulletinToQueue {
   /**
    * AddBulletinToQueue constructor.
    */
-  public function __construct(EntityTypeManager $entityTypeManager, LoggerChannelFactoryInterface $logger) {
+  public function __construct() {
    //  @todo Figure out if anything needs to be passed in as an argument.
   }
 
@@ -360,7 +360,7 @@ class AddBulletinToQueue {
       $messages = $this->messages[$type];
     }
 
-    return $messages
+    return $messages;
   }
 
   /**
