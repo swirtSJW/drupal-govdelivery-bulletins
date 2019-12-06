@@ -1,0 +1,8 @@
+access bulletin queue trigger api:
+  title: 'Access Bulletin Queue Trigger API'
+  description: 'Grants access to the Bulletin Queue Trigger API at /api/govdelivery_bulletins/queue?EndTime=[unix timestamp]'
+  restrict access: FALSE
+administer govdelivery bulletins settings:
+  title: 'Administer GovDelivery Bulletins Settings'
+  description: 'Grants access to configuration for GovDelivery Bulletins'
+  restrict access: FALSE
