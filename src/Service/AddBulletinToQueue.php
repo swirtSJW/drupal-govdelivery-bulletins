@@ -193,7 +193,7 @@ class AddBulletinToQueue {
 
 
   /**
-   * Adds an email addres  to the email_addresses array.
+   * Adds an email address  to the email_addresses array.
    *
    * @param string $address
    *   An email address to add.
@@ -246,20 +246,23 @@ class AddBulletinToQueue {
    *
    * @param DateTime $time
    *   The timestamp (optional) of when the queue item is to be actionalble.
-   *
-   * @return $this
    */
   public function addToQueue($time = NULL) {
     $this->time = $time ?? time();
-    // This is fun
-    /** @var \Drupal\QueueFactory $queue_factory */
-    $queue_factory = \Drupal::service('queue');
-    /** @var \Drupal\QueueInterface $queue */
-    $queue = $queue_factory->get('govdelivery_bulletins');
-    $queue->createItem($this->buildBulletinData());
-
-    // @todo What should this return?
-    return $this;
+    $can_be_queued = \Drupal::config('govdelivery_bulletins.settings')->get('enable_bulletin_queuing');
+    if ($can_be_queued) {
+      // Add it to the queue.
+      /** @var \Drupal\QueueFactory $queue_factory */
+      $queue_factory = \Drupal::service('queue');
+      /** @var \Drupal\QueueInterface $queue */
+      $queue = $queue_factory->get('govdelivery_bulletins');
+      $queue->createItem($this->buildBulletinData());
+      \Drupal::logger('govdelivery_bulletins')->info('Queued: @subject', ['@subject' => $this->subject]);
+    }
+    else {
+      // Queuing is not enabled in config, so only log it.
+      \Drupal::logger('govdelivery_bulletins')->info('Queuing Not Enabled: @subject', ['@subject' => $this->subject]);
+    }
   }
 
 /**

@@ -1,0 +1,4 @@
+enable_bulletin_queuing: 0
+enable_bulletin_queue_sends_to_govdelivery: 0
+api_queue_trigger_enabled: 0
+langcode: 'en'

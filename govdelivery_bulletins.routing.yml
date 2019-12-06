@@ -1,0 +1,19 @@
+govdelivery_bulletins.get_latest_nodes:
+  path: 'api/govdelivery_bulletins/queue'
+  defaults:
+    _controller: '\Drupal\govdelivery_bulletins\Controller\QueueTrigger::processToEndTime'
+  methods: [GET]
+  formats:
+    - html
+  requirements:
+    _permission: 'access bulletin queue trigger api'
+    _format: 'html'
+govdelivery_bulletins.govdelivery_bulletins_admin_form:
+  path: '/admin/config/services/govdelivery_bulletins'
+  defaults:
+    _form: '\Drupal\govdelivery_bulletins\Form\GovDeliveryBulletinsAdminForm'
+    _title: 'GovDelivery Bulletins Admin'
+  requirements:
+    _permission: 'administer govdelivery bulletins settings'
+  options:
+    _admin_route: TRUE

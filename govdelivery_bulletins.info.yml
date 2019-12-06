@@ -1,5 +1,6 @@
 name: GovDelivery Bulletins
 description: Provides service and queue for sending bulletins using GovDelivery Bulletins API.
-package: API
+configure: govdelivery_bulletins.govdelivery_bulletins_admin_form
+package: Web Services
 type: module
 core: 8.x

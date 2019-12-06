@@ -1,0 +1,5 @@
+govdelivery_bulletins.config_page:
+  title: 'GovDelivery Bulletins'
+  description: 'GovDelivery Bulletins settings .'
+  parent: system.admin_config_services
+  route_name: govdelivery_bulletins.govdelivery_bulletins_admin_form
