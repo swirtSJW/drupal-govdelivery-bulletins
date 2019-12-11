@@ -4,7 +4,6 @@ namespace Drupal\govdelivery_bulletins\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Logger\RfcLogLevel;
 
 /**
  * Class GovDeliveryBulletinsAdminForm.
@@ -55,6 +54,28 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
       '#default_value' => $config->get('api_queue_trigger_enabled'),
     ];
 
+    $form['govdelivery_username'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('GovDelivery Username'),
+      '#description' => $this->t(
+        'Stores GovDelivery username in database - THIS IS NOT RECOMMENDED.
+        Preferred method is to store in settings.local.php - see README for
+        instructions.'),
+      '#weight' => '5',
+      '#default_value' => $config->get('govdelivery_username'),
+    ];
+
+    $form['govdelivery_password'] = [
+      '#type' => 'password',
+      '#title' => $this->t('GovDelivery Password'),
+      '#description' => $this->t(
+        'Stores GovDelivery password in database - THIS IS NOT RECOMMENDED.
+        Preferred method is to store in settings.local.php - see README for
+        instructions.'),
+      '#weight' => '6',
+      '#default_value' => $config->get('govdelivery_password'),
+    ];
+
     $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
@@ -73,6 +94,8 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
       ->set('api_queue_trigger_enabled', $form_state->getValue('api_queue_trigger_enabled'))
       ->set('enable_bulletin_queuing', $form_state->getValue('enable_bulletin_queuing'))
       ->set('enable_bulletin_queue_sends_to_govdelivery', $form_state->getValue('enable_bulletin_queue_sends_to_govdelivery'))
+      ->set('govdelivery_username', $form_state->getValue('govdelivery_username'))
+      ->set('govdelivery_password', $form_state->getValue('govdelivery_password'))
       ->save();
   }
 
