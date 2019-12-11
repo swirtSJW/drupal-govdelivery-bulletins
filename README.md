@@ -42,3 +42,21 @@ To add a test, it would look like this.
 ```
 
 [GovDelivery Bulletins API](https://developer.govdelivery.com/api/comm_cloud_v1/Default.htm#API/Comm%20Cloud%20V1/API_CommCloudV1_Bulletins_CreateandSendBulletin.htm)
+
+## How to securely store GovDelivery username and password.
+
+Should be stored in settings.local.php, like so:
+```
+// GovDelivery settings.
+$settings['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME';
+$settings['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD';
+```
+Then to access:
+```
+$apiUsername = \Drupal\Core\Site\Settings::get('govdelivery_username');
+$apiPassword = \Drupal\Core\Site\Settings::get('govdelivery_password');
+
+```
+You can also save your username and password by setting them in the [GovDelivery Bulletins Admin form](/admin/config/services/govdelivery_bulletins).
+
+This is strongly discouraged, and presents a security vulnerability.
