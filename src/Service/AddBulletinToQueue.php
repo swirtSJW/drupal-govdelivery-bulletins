@@ -2,9 +2,7 @@
 
 namespace Drupal\govdelivery_bulletins\Service;
 
-use Drupal\Component\Utility;
-use Drupal\Core\Queue\QueueFactory;
-use Drupal\Core\Queue\QueueInterface;
+use Drupal\Component\Utility\Unicode;
 
 /**
  * Class for handling adding a GovDelivery bulletin to the queue.
