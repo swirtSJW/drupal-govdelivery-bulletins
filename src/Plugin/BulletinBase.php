@@ -1,0 +1,72 @@
+<?php
+
+namespace Drupal\govdelivery_bulletins\Plugin;
+
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Queue\QueueWorkerBase;
+
+/**
+ * Provides base functionality for the NodePublish Queue Workers.
+ */
+class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * BulletinBase constructor.
+   */
+  public function __construct() {
+
+  }
+
+  /**
+   * Processes the bulletins in the queue.
+   *
+   * @param DateTime $end_time
+   *   The timestamp (optional) to use for grabbing items created prior.
+   */
+  public function processQueue($end_time = NULL) {
+    // Call our queue service.
+    $queue_factory = \Drupal::service('queue');
+    $queue_manager = \Drupal::service('plugin.manager.queue_worker');
+
+    // Call bulletins service, and create an instance for processing.
+    $queue = $queue_factory->get('govdelivery_bulletins');
+    $queue_worker = $queue_manager->createInstance('govdelivery_bulletins');
+
+    // Get the number of items.
+    $number_of_queue = $queue->numberOfItems();
+
+    for ($i = 0; $i < $number_of_queue; $i++) {
+      // Get a queued item.
+      $item = $queue->claimItem();
+      if (($end_time && $item->created < $end_time) || empty($end_time)) {
+        // Call the send service.
+        $send = self::send($item->data);
+        if ($send === 200) {
+          // Response is good, so process item in queue.
+          $queue_worker->processItem($item->data);
+          // Now remove the processed item from the queue.
+          $queue->deleteItem($item);
+          return 'success';
+        }
+        return 'service not available';
+      }
+      else {
+        // Release it for another round of processing.
+        $queue_worker->releaseItem($item->data);
+        return 'item not within timestamp';
+      }
+      return 'nothing processed';
+    }
+  }
+
+  /**
+   * Calls the send service and passes the queued item.
+   *
+   * @param object $data
+   *   The queued data item we are passing.
+   */
+  public function send(object $data) {
+    return \Drupal::service('govdelivery_bulletins.send_bulletin')->send($data);
+  }
+
+}
