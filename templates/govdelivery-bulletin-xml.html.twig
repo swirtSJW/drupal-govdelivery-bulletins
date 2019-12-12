@@ -1,51 +1,67 @@
+{#
+/**
+ * @file
+ * Bulletin xml to be sent to govdelivery bulletin API.
+ *
+ * This is not to be rendered by Drupal and is only for use in this module.
+ * Resource for GovDelivery Bulletin API
+ * https://developer.govdelivery.com/api/comm_cloud_v1/Content/API/Comm%20Cloud%20V1/API_CommCloudV1_Bulletins_CreateandSendBulletin.htm
+
+ * Available variables:
+ * - body: THe body of the email bulletin. Contains HTML.
+ * - categories: array Category ids.
+ * - click_tracking: Bool to set if clicks should be tracked.
+ * - footer: The bulletin footer.
+ * - from_address: The address the email send is to come from.
+ * - header: The bulletin header.
+ * - open_tracking: Bool to set if the opening of email should be tracked.
+ * - publish_rss: Bool to set if this should be included in the rss feed.
+ * - send_time: The time the bulletin should be sent.
+ * - share_content_enabled: Bool to set if social sharing should be included.
+ * - sms_body: An optional body to be sent if SMS text is to be sent.
+ * - subject: The subject of the email.
+ * - topics: array Topic ids.
+ * - urgent: Bool to set if the urgent flag should be set.
+ * - vamc_url: The URL of the VAMC.
+ */
+#}
 <bulletin>
-  <header>{{ header }}</header>
-
-  {% if from_address is not empty %}
-    <from_address_id>{{ from_address }}</from_address_id>
-  {% endif %}
-
+  <header>{{ header | raw}}</header>
+{% if from_address is not empty %}
+  <from_address_id>{{ from_address }}</from_address_id>
+{% endif %}
   <subject>{{ subject }}</subject>
-
-  {% if body is not empty %}
-    <body>
-      <![CDATA[ {{ body }} }}]]>
-    </body>
-  {% endif %}
-
-  <footer>{{ footer }}</footer>
-
-  {% if sms_body is not empty %}
-    <sms_body>{{ sms_body }}</sms_body>
-  {% else %}
-    <sms_body nil='true'></sms_body>
-  {% endif %}
-
+{% if body is not empty %}
+  <body>
+    <![CDATA[ {{ body | raw }} ]]>
+  </body>
+{% endif %}
+  <footer>{{ footer | raw }}</footer>
+{% if sms_body is not empty %}
+  <sms_body>{{ sms_body }}</sms_body>
+{% else %}
+  <sms_body nil='true'></sms_body>
+{% endif %}
   <publish_rss type='boolean'>{{ (publish_rss is not empty) ? 'true' : 'false' }}</publish_rss>
   <open_tracking type='boolean'>{{ (open_tracking is not empty) ? 'true' : 'false' }}</open_tracking>
   <click_tracking type='boolean'>{{ (click_tracking is not empty) ? 'true' : 'false' }}</click_tracking>
-
-  {% if sms_body is not empty %}
-    <send_time>{{ send_time }}</send_time>
-  {% endif %}
-  <urgent type='boolean'>{{ (urgent is not empty) ? 'true' : 'false' }}</urgent>
-
   <share_content_enabled type='boolean'>{{ (share_content_enabled is not empty) ? 'true' : 'false' }}</share_content_enabled>
-
+  <urgent type='boolean'>{{ (urgent is not empty) ? 'true' : 'false' }}</urgent>
+{% if send_time is not empty %}
+  <send_time>{{ send_time }}</send_time>
+{% endif %}
   <topics type='array'>
-    {% for topic in topics %}
-      <topic>
-        <code>{{ topic }}</code>
-      </topic>
-    {% endfor %}
+{% for topic in topics %}
+    <topic>
+      <code>{{ topic }}</code>
+    </topic>
+{% endfor %}
   </topics>
-
   <categories type='array'>
-    {% for category in categories %}
-      <category>
-        <code>{{ category }}</code>
-      </category>
-    {% endfor %}
+{% for category in categories %}
+    <category>
+      <code>{{ category }}</code>
+    </category>
+{% endfor %}
   </categories>
-
 </bulletin>

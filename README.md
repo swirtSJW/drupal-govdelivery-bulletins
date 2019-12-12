@@ -17,7 +17,6 @@ It is called like this:
         ->addCategory('emergency')  // Optional.
         ->setFooter("Some body text for the message.")  // Optional.
         ->setFromAddress('us@example.org')
-        ->setGovDeliveryID('some_unique_id')
         ->setHeader("Some body text for the message.")
         ->setSubject('Some text for the email subject.')
         ->setSMSBody('Some text SMS text.')  // Optional.

@@ -93,18 +93,12 @@ class AddBulletinToQueue {
   private $fromAddress;
 
   /**
-   * The GovDelivery ID to use in the send.
-   *
-   * @var string
-   */
-  private $govDeliveryId = NULL;
-
-  /**
    * The header to use for the bulletin.
    *
    * @var string
    */
   private $header = '';
+
 
   /**
    * The time that the bulletin should be sent if not sending immediately.
@@ -139,28 +133,28 @@ class AddBulletinToQueue {
    *
    * @var bool
    */
-  private $clickTracking = FALSE;
+  private $click_tracking = FALSE;
 
   /**
    * Enable open tracking on the bulletin email.
    *
    * @var bool
    */
-  private $openTracking = FALSE;
+  private $open_tracking = FALSE;
 
   /**
    * Enable to publish the bulletin to the account activity RSS feed.
    *
    * @var bool
    */
-  private $publishRss = FALSE;
+  private $publish_rss = FALSE;
 
   /**
    * Enable to share the content to Facebook or Twitter.
    *
    * @var bool
    */
-  private $shareContentEnabled = FALSE;
+  private $share_content_enabled = FALSE;
 
   /**
    * Enable to ignore the users' digest settings and send it immediately.
@@ -173,7 +167,7 @@ class AddBulletinToQueue {
    * AddBulletinToQueue constructor.
    */
   public function __construct() {
-   //  @todo Figure out if anything needs to be passed in as an argument.
+
   }
 
   /**
@@ -296,37 +290,36 @@ class AddBulletinToQueue {
     if ($this->validateTest($error_messages)) {
       // This is a test. Use the test template.
       $this->dedupeQueue();
-      $renderable = [
-      '#theme' => 'govdelivery_bulletin_test_xml',
-      '#email_addresses' => $this->emailAddresses,
+      $template_variables = [
+        'email_addresses' => $this->emailAddresses,
       ];
-      $xml = \Drupal::service('renderer')->render($renderable);
+      $xml = (string) twig_render_template(drupal_get_path('module', 'govdelivery_bulletins') . '/templates/govdelivery-bulletin-test-xml.html.twig', $template_variables);
     }
     elseif (!$this->flag_test && $this->validate($error_messages)) {
       // This is not a test and is valid.
       $this->dedupeQueue();
-      $renderable = [
-        '#theme' => 'govdelivery_bulletin_xml',
-        '#body' => $this->body,
-        '#categories' => $this->categories,
-        '#click_tracking' => $this->clickTracking,
-        '#footer' => $this->footer,
-        '#from_address' => $this->fromAddress,
-        '#header' => $this->header,
-        '#open_tracking' => $this->open_tracking,
-        '#publish_rss' => $this->publish_rss,
-        '#send_time' => $this->sendTime,
-        '#share_content_enabled' => $this->shareContentEnabled,
-        '#sms_body' => $this->smsBody,
-        '#subject' => $this->subject,
-        '#topics' => $this->topics,
-        '#urgent' => $this->urgent,
+      $template_variables = [
+        'body' => $this->body,
+        'categories' => $this->categories,
+        'click_tracking' => $this->click_tracking,
+        'footer' => $this->footer,
+        'from_address' => $this->fromAddress,
+        'header' => $this->header,
+        'open_tracking' => $this->open_tracking,
+        'publish_rss' => $this->publish_rss,
+        'send_time' => $this->sendTime,
+        'share_content_enabled' => $this->share_content_enabled,
+        'sms_body' => $this->smsBody,
+        'subject' => $this->subject,
+        'topics' => $this->topics,
+        'urgent' => $this->urgent,
       ];
-      $xml = \Drupal::service('renderer')->render($renderable);
+      $xml = (string) twig_render_template(drupal_get_path('module', 'govdelivery_bulletins') . '/templates/govdelivery-bulletin-xml.html.twig', $template_variables);
     }
     else {
       // Nothing validated so log and throw an exception with $error_messages.
       // @TODO finish this.
+
     }
 
     return $xml;
@@ -422,12 +415,6 @@ class AddBulletinToQueue {
    */
   public function setFromAddress($value) {
     $this->fromAddress = $value;
-    return $this;
-  }
-
-  // @todo Is this needed?
-  public function setGovDeliveryID($value) {
-    $this->gov_delivery_id = $value;
     return $this;
   }
 
@@ -537,13 +524,17 @@ class AddBulletinToQueue {
    *   An empty array passed by reference so the error messages can be handled
    *   by the caller.
    *
-   *   @return $this
+   *   @return bool
    */
   private function validate(array &$error_messages) {
-    // Length variables trigger a warning in the setter,  but are not a  defect.
-    // Body is not required. If not present, gov delivery will use template on file with GovDelivery.
-    // Header is not required. If not present, gov delivery will use template on file with GovDelivery.
-    // sms_body has a 140 character limit.  Set nil="true" if no body should be sent.
+    // Length validation trigger a warning in the setter, but are valid.
+    // Body is not required. If not present, gov delivery will use template on
+    // file with GovDelivery.
+    // Header and footer are not required. If not present, gov delivery will use
+    // templates on file with GovDelivery.
+    // Currently there is nothing that is invalid, but leaving this here as
+    // cases may arrive and this sets the place to handle them.
+    return TRUE;
   }
 
 
@@ -571,14 +562,15 @@ class AddBulletinToQueue {
           $error_messages[] = t('The address @address is not a valid address.', ['@address' => $address]);
         }
       }
+      $return = (empty($error_messages)) ? TRUE : FALSE;
     }
 
-    return (empty($error_messages)) ? TRUE : FALSE;
+    return $return;
   }
 
 
   /**
-   * Displays the messages of a given type tor drupal status.
+   * Displays the messages of a given type for drupal status.
    *
    * @param string $type
    *   The type of messages to display [warning, error, status, or all]].
@@ -588,18 +580,21 @@ class AddBulletinToQueue {
   }
 
   /**
-   * Loag a message to watchdog.
+   * Log a message to watchdog.
    *
    * @param string $message
    *   The message to the watchdog log.
    */
-  private function log($message) {
-    // Append vars placeholders.
-    // @TODO make this meaningful.  It is placeholder gibberish right now.
-    $message .= 'node @title, uid @uid';
-    \Drupal::logger('govdelivery_bulletins')->notice($message, [
-      '@title' => $node->getTitle(),
-      '@uid' => $this->uid,
-    ]);
+  private function log($message, $variables = []) {
+    \Drupal::logger('govdelivery_bulletins')->notice($message, $variables);
+  }
+
+  /**
+   * @deprecated Left here just to keep from causing fatal errors.
+   */
+  public function setGovDeliveryID($unique_id) {
+    // This is deprecated, do nothing but log it.
+    $this->log('AddBulletinToQueue->setGovDeliveryID is deprecated.  Please remove any calls to it.');
+    return $this;
   }
 }
