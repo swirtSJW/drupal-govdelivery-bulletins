@@ -18,6 +18,7 @@ It is called like this:
         ->setFooter("Some body text for the message.")  // Optional.
         ->setFromAddress('us@example.org')
         ->setHeader("Some body text for the message.")
+        ->setQueueUid('some unique string') //optional
         ->setSubject('Some text for the email subject.')
         ->setSMSBody('Some text SMS text.')  // Optional.
         ->addTopic('ABC-123')  // Optional.

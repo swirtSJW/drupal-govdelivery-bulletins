@@ -162,6 +162,13 @@ class AddBulletinToQueue {
   private $urgent = FALSE;
 
   /**
+   * The queue object.
+   *
+   * @var \Drupal\QueueInterface
+   */
+  private $queue = NULL;
+
+  /**
    * AddBulletinToQueue constructor.
    */
   public function __construct() {
@@ -244,10 +251,7 @@ class AddBulletinToQueue {
     $can_be_queued = \Drupal::config('govdelivery_bulletins.settings')->get('enable_bulletin_queuing');
     if ($can_be_queued) {
       // Add it to the queue.
-      /** @var \Drupal\QueueFactory $queue_factory */
-      $queue_factory = \Drupal::service('queue');
-      /** @var \Drupal\QueueInterface $queue */
-      $queue = $queue_factory->get('govdelivery_bulletins');
+      $queue = $this->getQueue();
       $queue->createItem($this->buildBulletinData());
       \Drupal::logger('govdelivery_bulletins')->info('Queued: @subject', ['@subject' => $this->subject]);
     }
@@ -317,7 +321,6 @@ class AddBulletinToQueue {
     else {
       // Nothing validated so log and throw an exception with $error_messages.
       // @TODO finish this.
-
     }
 
     return $xml;
@@ -328,10 +331,42 @@ class AddBulletinToQueue {
    */
   private function dedupeQueue() {
     if ($this->flag_dedupe === TRUE) {
-      // @todo Add the guts of this to dedupe based on $this->queue_uid.
-      // https://www.drupal.org/project/govdelivery_bulletins/issues/3096347
+      $queue = $this->getQueue();
+      $item_count = $queue->numberOfItems();
+      $removed_count = 0;
+      // The queue will keep grabbing the same item after it is released, so
+      // we need to grab them all and mass release them.
+      $queued_bulletins_to_release = [];
+      for ($i = 0; $i < $item_count; $i++) {
+        // Get a queued item
+        $queued_bulletin = $queue->claimItem(0);
+        if ($queued_bulletin) {
+          try {
+            // Process it
+            // Check if it has the same queue id as the one we will be adding.
+            if ($this->queueUid === $queued_bulletin->data->qid) {
+              // It is a match to the new one, delete it.
+              $queue->deleteItem($queued_bulletin);
+              $removed_count++;
+            }
+            else {
+              // It is not a duplicate, so release it back into the queue.
+              $queued_bulletins_to_release[$queued_bulletin->item_id] = $queued_bulletin;
+            }
+          } catch (SuspendQueueException $e) {
+            // If there was an Exception thrown because of an error
+            // Releases the item that the worker could not process.
+            // Another worker can come and process it
+            $queued_bulletins_to_release[$queued_bulletin->item_id] = $queued_bulletin;
+            continue;
+          }
+        }
+      }
 
-      // If you can, obtain a count of the number removed and add a status message.
+      // Release the non-duplicates.
+      foreach ($queued_bulletins_to_release as $queued_bulletins_to_release) {
+        $queue->releaseItem($queued_bulletins_to_release);
+      }
     }
   }
 
@@ -355,6 +390,17 @@ class AddBulletinToQueue {
     }
 
     return $messages;
+  }
+
+  private function getQueue() {
+    if (empty($this->queue)) {
+      // Load the queue.
+      /** @var \Drupal\QueueFactory $queue_factory */
+      $queue_factory = \Drupal::service('queue');
+      $this->queue = $queue_factory->get('govdelivery_bulletins');
+    }
+
+    return $this->queue;
   }
 
   /**
@@ -430,7 +476,7 @@ class AddBulletinToQueue {
   }
 
   /**
-   * Setter for the queueUID which is used for identifiying duplicates.
+   * Setter for the queueUid which is used for identifiying duplicates.
    *
    * @param string $quid
    *   A unique id that is specific to identifying the queue item and
@@ -438,7 +484,7 @@ class AddBulletinToQueue {
    *
    * @return $this
    */
-  public function setQueueUID($quid) {
+  public function setQueueUid($quid) {
     $this->queueUid = $quid;
     return $this;
   }
