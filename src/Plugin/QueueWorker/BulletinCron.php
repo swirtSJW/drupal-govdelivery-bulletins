@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\govdelivery_bulletins\Plugin;
+namespace Drupal\govdelivery_bulletins\Plugin\QueueWorker;
 
 /**
  * Provides base functionality for the Bulletin Queue Worker.
