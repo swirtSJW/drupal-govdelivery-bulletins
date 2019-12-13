@@ -26,8 +26,8 @@ class QueueTrigger extends ControllerBase {
     }
     else {
       // Process our bulletins.
-      $trigger = new BulletinBase();
-      $status = $trigger->processQueue($time);
+      $queueWorker = new BulletinBase();
+      $status = $queueWorker->processQueue($time);
 
       // The endpoint has been called.
       // Log status.

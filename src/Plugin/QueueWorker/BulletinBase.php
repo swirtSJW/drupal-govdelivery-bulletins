@@ -27,15 +27,6 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
   }
 
   /**
-   * The base queue service manager provided by Drupal.
-   *
-   * @var object
-   */
-  private function queueManager() {
-    return \Drupal::service('plugin.manager.queue_worker');
-  }
-
-  /**
    * Processes the bulletins in the queue.
    *
    * @param DateTime $end_time
@@ -44,29 +35,30 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
   public function processQueue($end_time = NULL) {
     // Call our queue service.
     $queue_factory = $this->queueFactory();
-    $queue_manager = $this->queueManager();
 
     // Call bulletins service, and create an instance for processing.
     $queue = $queue_factory->get('govdelivery_bulletins');
-    $queue_worker = $queue_manager->createInstance('govdelivery_bulletins');
 
     // Get the number of items.
     $number_of_queue = $queue->numberOfItems();
 
     for ($i = 0; $i < $number_of_queue; $i++) {
       // Get a queued item.
+      // @TODO the release time should be close to the timeout time on the govdelivery API.
       $item = $queue->claimItem(20);
       if (($end_time && $item->created < $end_time) || empty($end_time)) {
-        // Now process individual bulletin..
-        $process_item = self::processItem($item);
+        // Now process individual bulletin.
+        $process_item = self::processItem($item->data);
         if ($process_item === 'good') {
+          // Now remove the processed item from the queue.
+          $queue->deleteItem($item);
           return 'success';
         }
         return 'service not available';
       }
       else {
         // Release it for another round of processing.
-        $queue_worker->releaseItem($item->data);
+        $queue->releaseItem($item);
         return 'item not within timestamp';
       }
       return 'nothing processed';
@@ -79,21 +71,10 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
    * @param object $item
    *   The queued data item we are processing.
    */
-  public function processItem($item) {
-    // Call our queue service.
-    $queue_factory = $this->queueFactory();
-    $queue_manager = $this->queueManager();
-
-    // Call bulletins service, and create an instance for processing.
-    $queue = $queue_factory->get('govdelivery_bulletins');
-    $queue_worker = $queue_manager->createInstance('govdelivery_bulletins');
-    $send = $this->send($item->data->xml);
+  public function processItem($data) {
+    $send = $this->send($data->xml);
     // Check for 200 from send service.
     if ($send === 200) {
-      // Response is good, so process item in queue.
-      $queue_worker->processItem($item);
-      // Now remove the processed item from the queue.
-      $queue->deleteItem($item);
       return 'good';
     }
     return 'failure';
