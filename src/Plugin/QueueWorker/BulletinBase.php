@@ -2,6 +2,7 @@
 
 namespace Drupal\govdelivery_bulletins\Plugin\QueueWorker;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 
@@ -14,6 +15,13 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
    * BulletinBase constructor.
    */
   public function __construct() {
+
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
 
   }
 
@@ -60,11 +68,14 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
       }
       else {
         // Release it for another round of processing.
-        $queue->releaseItem($item);
+        if (!empty($item)) {
+          $queue->releaseItem($item);
+        }
         return 'item not within timestamp';
       }
-      return 'nothing processed';
     }
+    return 'nothing processed';
+
   }
 
   /**
