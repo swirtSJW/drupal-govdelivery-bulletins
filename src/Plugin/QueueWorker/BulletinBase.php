@@ -49,8 +49,8 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
       $item = $queue->claimItem(20);
       if ((!empty($item)) && (($end_time && $item->created < $end_time) || empty($end_time))) {
         // Now process individual bulletin.
-        $process_item = $this->processItem($item->data);
-        if ($process_item === 200) {
+        $response = $this->processItem($item->data);
+        if ($response === 200) {
           // Now remove the processed item from the queue.
           $queue->deleteItem($item);
           return 'success';
@@ -75,17 +75,7 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
    */
   public function processItem($data) {
     // Send and return response.
-    return $this->send($data->xml);
-  }
-
-  /**
-   * Calls the send service and passes the queued item.
-   *
-   * @param object $data
-   *   The queued data from the item we are processing.
-   */
-  private function send(object $data) {
-    return \Drupal::service('govdelivery_bulletins.send_bulletin')->send($data);
+    return \Drupal::service('govdelivery_bulletins.send_bulletin')->send($data->xml);
   }
 
 }
