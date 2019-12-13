@@ -54,6 +54,17 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
       '#default_value' => $config->get('api_queue_trigger_enabled'),
     ];
 
+    $form['govdelivery_endpoint'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('GovDelivery API Endpoint'),
+      '#description' => $this->t(
+        'Stores GovDelivery api endpoint in database - THIS IS NOT RECOMMENDED.
+        Preferred method is to store in settings.local.php - see README for
+        instructions.'),
+      '#weight' => '5',
+      '#default_value' => $config->get('govdelivery_endpoint'),
+    ];
+
     $form['govdelivery_username'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GovDelivery Username'),
@@ -61,7 +72,7 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
         'Stores GovDelivery username in database - THIS IS NOT RECOMMENDED.
         Preferred method is to store in settings.local.php - see README for
         instructions.'),
-      '#weight' => '5',
+      '#weight' => '6',
       '#default_value' => $config->get('govdelivery_username'),
     ];
 
@@ -72,7 +83,7 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
         'Stores GovDelivery password in database - THIS IS NOT RECOMMENDED.
         Preferred method is to store in settings.local.php - see README for
         instructions.'),
-      '#weight' => '6',
+      '#weight' => '7',
       '#default_value' => $config->get('govdelivery_password'),
     ];
 
@@ -94,6 +105,7 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
       ->set('api_queue_trigger_enabled', $form_state->getValue('api_queue_trigger_enabled'))
       ->set('enable_bulletin_queuing', $form_state->getValue('enable_bulletin_queuing'))
       ->set('enable_bulletin_queue_sends_to_govdelivery', $form_state->getValue('enable_bulletin_queue_sends_to_govdelivery'))
+      ->set('govdelivery_endpoint', $form_state->getValue('govdelivery_endpoint'))
       ->set('govdelivery_username', $form_state->getValue('govdelivery_username'))
       ->set('govdelivery_password', $form_state->getValue('govdelivery_password'))
       ->save();

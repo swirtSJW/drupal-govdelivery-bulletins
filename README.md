@@ -42,16 +42,18 @@ To add a test, it would look like this.
 
 [GovDelivery Bulletins API](https://developer.govdelivery.com/api/comm_cloud_v1/Default.htm#API/Comm%20Cloud%20V1/API_CommCloudV1_Bulletins_CreateandSendBulletin.htm)
 
-## How to securely store GovDelivery username and password.
+## How to securely store GovDelivery API endpoint, username and password.
 
 Should be stored in settings.local.php, like so:
 ```
 // GovDelivery settings.
+$config['govdelivery_endpoint'] = 'GOVDELIVERY-API-ENDPOINT';
 $config['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME';
 $config['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD';
 ```
 Then to access:
 ```
+$apiEndPoint = \Drupal\Core\Site\Settings::get('govdelivery_endpoint');
 $apiUsername = \Drupal\Core\Site\Settings::get('govdelivery_username');
 $apiPassword = \Drupal\Core\Site\Settings::get('govdelivery_password');
 
