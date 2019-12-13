@@ -6,7 +6,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Queue\QueueWorkerBase;
 
 /**
- * Provides base functionality for the NodePublish Queue Workers.
+ * Provides base functionality for the GovDelivery Queue Workers.
  */
 class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInterface {
 
@@ -20,7 +20,8 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
   /**
    * The base queue service provided by Drupal.
    *
-   * @var object
+   * @return object
+   *   A Drupal service wrapper.
    */
   private function queueFactory() {
     return \Drupal::service('queue');
@@ -46,14 +47,15 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
       // Get a queued item.
       // @TODO the release time should be close to the timeout time on the govdelivery API.
       $item = $queue->claimItem(20);
-      if (($end_time && $item->created < $end_time) || empty($end_time)) {
+      if ((!empty($item)) && (($end_time && $item->created < $end_time) || empty($end_time))) {
         // Now process individual bulletin.
-        $process_item = self::processItem($item->data);
-        if ($process_item === 'good') {
+        $process_item = $this->processItem($item->data);
+        if ($process_item === 200) {
           // Now remove the processed item from the queue.
           $queue->deleteItem($item);
           return 'success';
         }
+        $queue->releaseItem($item);
         return 'service not available';
       }
       else {
@@ -68,23 +70,19 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
   /**
    * Processes the queued item.
    *
-   * @param object $item
+   * @param object $data
    *   The queued data item we are processing.
    */
   public function processItem($data) {
-    $send = $this->send($data->xml);
-    // Check for 200 from send service.
-    if ($send === 200) {
-      return 'good';
-    }
-    return 'failure';
+    // Send and return response.
+    return $this->send($data->xml);
   }
 
   /**
    * Calls the send service and passes the queued item.
    *
    * @param object $data
-   *   The queued data item we are passing.
+   *   The queued data from the item we are processing.
    */
   private function send(object $data) {
     return \Drupal::service('govdelivery_bulletins.send_bulletin')->send($data);
