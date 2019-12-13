@@ -36,4 +36,5 @@ class QueueTrigger extends ControllerBase {
       return $build;
     }
   }
+
 }

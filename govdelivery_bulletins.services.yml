@@ -1,5 +1,7 @@
 services:
   govdelivery_bulletins.add_bulletin_to_queue:
     class: Drupal\govdelivery_bulletins\Service\AddBulletinToQueue
-    # @TODO align arguments with need.
+    arguments: []
+  govdelivery_bulletins.send_bulletin:
+    class: Drupal\govdelivery_bulletins\Service\SendBulletin
     arguments: []
