@@ -47,8 +47,8 @@ To add a test, it would look like this.
 Should be stored in settings.local.php, like so:
 ```
 // GovDelivery settings.
-$settings['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME';
-$settings['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD';
+$config['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME';
+$config['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD';
 ```
 Then to access:
 ```
