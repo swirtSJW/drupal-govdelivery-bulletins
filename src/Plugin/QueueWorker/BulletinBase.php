@@ -64,23 +64,19 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
         // Now process individual bulletin.
         $response = $this->processItem($item->data);
         if ($response === 200) {
-          // Now remove the processed item from the queue.
+          // Connection a success - remove the processed item from the queue.
           $queue->deleteItem($item);
-          return 'success';
         }
+        // Service not available - release the item.
         $queue->releaseItem($item);
-        return 'service not available';
       }
       else {
-        // Release it for another round of processing.
+        // Connection not made - release the item another round of processing.
         if (!empty($item)) {
           $queue->releaseItem($item);
         }
-        return 'item not within timestamp';
       }
     }
-    return 'nothing processed';
-
   }
 
   /**

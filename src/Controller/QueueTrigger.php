@@ -31,11 +31,11 @@ class QueueTrigger extends ControllerBase {
 
       // The endpoint has been called.
       // Log status.
-      $vars = ['@time' => date('m-d-Y H:i:s', $time), '@status' => $status];
+      $vars = ['@time' => date('m-d-Y H:i:s', $time)];
       $build = [
-        '#markup' => $this->t('The queue has been triggered for anything prior to: @time and returned this status: @status', $vars),
+        '#markup' => $this->t('The queue has been triggered for anything prior to: @time', $vars),
       ];
-      \Drupal::logger('govdelivery_bulletins')->info('The queue has been triggered for anything prior to: @time and returned this status: @status', $vars);
+      \Drupal::logger('govdelivery_bulletins')->info('The queue has been triggered for anything prior to: @time', $vars);
 
       return $build;
     }
