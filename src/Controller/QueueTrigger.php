@@ -4,6 +4,7 @@ namespace Drupal\govdelivery_bulletins\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Drupal\govdelivery_bulletins\Plugin\QueueWorker\BulletinBase;
 
 /**
  * A controller for the GovDelivery Queue Trigger.
@@ -24,10 +25,13 @@ class QueueTrigger extends ControllerBase {
       throw new NotFoundHttpException();
     }
     else {
-      // The endpoint has been called successfully.
-      // @Todo Call the queue runner service.
-      // Log it.
-      $vars = ['@time' =>  date('m-d-Y H:i:s', $time)];
+      // Process our bulletins.
+      $queueWorker = new BulletinBase();
+      $status = $queueWorker->processQueue($time);
+
+      // The endpoint has been called.
+      // Log status.
+      $vars = ['@time' => date('m-d-Y H:i:s', $time)];
       $build = [
         '#markup' => $this->t('The queue has been triggered for anything prior to: @time', $vars),
       ];
