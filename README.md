@@ -45,19 +45,18 @@ To add a test, it would look like this.
 
 ## How to securely store GovDelivery API endpoint, username and password.
 
-Should be stored in settings.local.php, like so:
+Should be stored in settings.php, like so:
 ```
 // GovDelivery settings.
-$config['govdelivery_endpoint'] = 'GOVDELIVERY-API-ENDPOINT';
-$config['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME';
-$config['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD';
+$config['govdelivery_endpoint'] = 'GOVDELIVERY-API-ENDPOINT' ?: FALSE;
+$config['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME' ?: FALSE;
+$config['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD'?: FALSE;
 ```
 Then to access:
 ```
-$apiEndPoint = \Drupal\Core\Site\Settings::get('govdelivery_endpoint');
-$apiUsername = \Drupal\Core\Site\Settings::get('govdelivery_username');
-$apiPassword = \Drupal\Core\Site\Settings::get('govdelivery_password');
-
+\Drupal::config('mymodule.settings')->get('govdelivery_endpoint');
+\Drupal::config('mymodule.settings')->get('govdelivery_username');
+\Drupal::config('mymodule.settings')->get('govdelivery_password');
 ```
 You can also save your username and password by setting them in the [GovDelivery Bulletins Admin form](/admin/config/services/govdelivery_bulletins).
 
