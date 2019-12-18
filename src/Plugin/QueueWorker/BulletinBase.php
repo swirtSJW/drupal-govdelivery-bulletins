@@ -8,6 +8,11 @@ use Drupal\Core\Queue\QueueWorkerBase;
 
 /**
  * Provides base functionality for the GovDelivery Queue Workers.
+ *
+ * @QueueWorker(
+ *   id = "govdelivery_bulletins",
+ *   title = @Translation("Process GovDelivery Bulletins"),
+ * )
  */
 class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInterface {
 
@@ -55,6 +60,9 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
 
     // Get the number of items.
     $number_of_queue = $queue->numberOfItems();
+    // The queue will keep grabbing the same item after it is released, so
+    // we need to grab them all and mass release them.
+    $queued_bulletins_to_release = [];
 
     for ($i = 0; $i < $number_of_queue; $i++) {
       // Get a queued item.
@@ -68,14 +76,20 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
           $queue->deleteItem($item);
         }
         // Service not available - release the item.
-        $queue->releaseItem($item);
+        $queued_bulletins_to_release[$item->item_id] = $item;
+
       }
       else {
-        // Connection not made - release the item another round of processing.
+        // Item intentionally not processed - release for another time.
         if (!empty($item)) {
-          $queue->releaseItem($item);
+          $queued_bulletins_to_release[$item->item_id] = $item;
         }
       }
+    }
+
+    // Processing of queue done, release all unprocessed items.
+    foreach ($queued_bulletins_to_release as $bulletin_to_release) {
+      $queue->releaseItem($bulletin_to_release);
     }
   }
 
@@ -87,7 +101,7 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
    */
   public function processItem($data) {
     // Send and return response.
-    return \Drupal::service('govdelivery_bulletins.send_bulletin')->send($data->xml);
+    return \Drupal::service('govdelivery_bulletins.send_bulletin')->send($data->xml, $data->qid);
   }
 
 }

@@ -48,15 +48,16 @@ To add a test, it would look like this.
 Should be stored in settings.local.php, like so:
 ```
 // GovDelivery settings.
-$config['govdelivery_endpoint'] = 'GOVDELIVERY-API-ENDPOINT';
-$config['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME';
-$config['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD';
+$config['govdelivery_bulletins.settings']['govdelivery_endpoint'] = 'GOVDELIVERY-API-ENDPOINT';
+$config['govdelivery_bulletins.settings']['govdelivery_username'] = 'YOUR-GOVDELIVERY-USERNAME';
+$config['govdelivery_bulletins.settings']['govdelivery_password'] = 'YOUR-GOVDELIVERY-PASSWORD';
 ```
 Then to access:
 ```
-$apiEndPoint = \Drupal\Core\Site\Settings::get('govdelivery_endpoint');
-$apiUsername = \Drupal\Core\Site\Settings::get('govdelivery_username');
-$apiPassword = \Drupal\Core\Site\Settings::get('govdelivery_password');
+$config = \Drupal::config('govdelivery_bulletins.settings');
+$apiEndPoint = $config->get('govdelivery_endpoint');
+$apiUsername = $config->get('govdelivery_username');
+$apiPassword = $config->get('govdelivery_password');
 
 ```
 You can also save your username and password by setting them in the [GovDelivery Bulletins Admin form](/admin/config/services/govdelivery_bulletins).

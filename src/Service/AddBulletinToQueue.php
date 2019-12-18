@@ -3,6 +3,7 @@
 namespace Drupal\govdelivery_bulletins\Service;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Queue\SuspendQueueException;
 
 /**
  * Class for handling adding a GovDelivery bulletin to the queue.
@@ -497,7 +498,7 @@ class AddBulletinToQueue {
    *
    * @return $this
    */
-  public function setSendTime(Datetime $send_time) {
+  public function setSendTime(\Datetime $send_time) {
     $this->sendTime = $send_time;
     return $this;
   }
