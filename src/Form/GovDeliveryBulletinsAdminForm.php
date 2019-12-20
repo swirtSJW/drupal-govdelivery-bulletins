@@ -54,6 +54,26 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
       '#default_value' => $config->get('api_queue_trigger_enabled'),
     ];
 
+    $description = $this->t('Allows accessing the API Queue Trigger by way of basic auth.');
+    $caution = $this->t('Requires @basic_auth module be enabled.', ['@basic_auth' = 'basic_auth']);
+    // Check to see if basic_auth module exists.
+    $moduleHandler = \Drupal::service('module_handler');
+    if ($moduleHandler->moduleExists('basic_auth')) {
+      $status = "basic_auth: <strong>{$this->t('enabled')}</strong>";
+      $description = "{$description}<br/>{$caution}<br/>{$status}";
+    }
+    else {
+      $status = "basic_auth: <strong>{$this->t('disabled')}</strong>";
+      $description = "{$description}<br/><strong>{$caution}</strong><br/>{$status}";
+    }
+    $form['api_queue_trigger_allow_basic_auth'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Allow @basic_auth to be used to access API Queue Trigger', ['@basic_auth' = 'basic_auth']),
+      '#description' => $description,
+      '#weight' => '5',
+      '#default_value' => $config->get('api_queue_trigger_allow_basic_auth'),
+    ];
+
     $form['govdelivery_endpoint'] = [
       '#type' => 'textfield',
       '#title' => $this->t('GovDelivery API Endpoint'),
@@ -61,7 +81,7 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
         'Stores GovDelivery api endpoint in database - THIS IS NOT RECOMMENDED.
         Preferred method is to store in settings.local.php - see README for
         instructions.'),
-      '#weight' => '5',
+      '#weight' => '6',
       '#default_value' => $config->get('govdelivery_endpoint'),
     ];
 
@@ -103,6 +123,7 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
     $config = self::configFactory()->getEditable('govdelivery_bulletins.settings');
     $config
       ->set('api_queue_trigger_enabled', $form_state->getValue('api_queue_trigger_enabled'))
+      ->set('api_queue_trigger_allow_basic_auth', $form_state->getValue('api_queue_trigger_allow_basic_auth'))
       ->set('enable_bulletin_queuing', $form_state->getValue('enable_bulletin_queuing'))
       ->set('enable_bulletin_queue_sends_to_govdelivery', $form_state->getValue('enable_bulletin_queue_sends_to_govdelivery'))
       ->set('govdelivery_endpoint', $form_state->getValue('govdelivery_endpoint'))
