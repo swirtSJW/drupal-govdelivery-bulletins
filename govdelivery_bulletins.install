@@ -5,13 +5,12 @@
  * Install and update hooks for govdelivery_bulletins module.
  */
 
-use Drupal\Core\Queue\QueueFactory;
-use Drupal\Core\Queue\QueueInterface;
-
 /**
- * Implements hook_delete().
+ *  Implements hook_uninstall().
  */
-function govdelivery_bulletins_delete() {
-  // @TODO There should be a queue worker here that just deletes all
-  // govdelivery_bulletins from the queue.
+function govdelivery_bulletins_uninstall() {
+  $database = \Drupal::database();
+  $query = $database->delete('queue')
+  ->condition('name', 'govdelivery_bulletins')
+  ->execute();
 }
