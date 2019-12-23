@@ -55,7 +55,7 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
     ];
 
     $description = $this->t('Allows accessing the API Queue Trigger by way of basic auth.');
-    $caution = $this->t('Requires @basic_auth module be enabled.', ['@basic_auth' = 'basic_auth']);
+    $caution = $this->t('Requires @basic_auth module be enabled.', ['@basic_auth' => 'basic_auth']);
     // Check to see if basic_auth module exists.
     $moduleHandler = \Drupal::service('module_handler');
     if ($moduleHandler->moduleExists('basic_auth')) {
@@ -68,7 +68,7 @@ class GovDeliveryBulletinsAdminForm extends FormBase {
     }
     $form['api_queue_trigger_allow_basic_auth'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Allow @basic_auth to be used to access API Queue Trigger', ['@basic_auth' = 'basic_auth']),
+      '#title' => $this->t('Allow @basic_auth to be used to access API Queue Trigger', ['@basic_auth' => 'basic_auth']),
       '#description' => $description,
       '#weight' => '5',
       '#default_value' => $config->get('api_queue_trigger_allow_basic_auth'),
