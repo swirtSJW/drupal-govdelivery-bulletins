@@ -5,3 +5,7 @@ services:
   govdelivery_bulletins.send_bulletin:
     class: Drupal\govdelivery_bulletins\Service\SendBulletin
     arguments: []
+  govdelivery_bulletins.route_subscriber:
+    class: Drupal\govdelivery_bulletins\Routing\RouteSubscriber
+    tags:
+      - { name: event_subscriber }

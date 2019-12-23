@@ -16,7 +16,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   protected function alterRoutes(RouteCollection $collection) {
     // Is basic_auth module enabled?
     $moduleHandler = \Drupal::service('module_handler');
-    $basic_auth_enabled = $moduleHandler->moduleExists('basic_auth')
+    $basic_auth_enabled = $moduleHandler->moduleExists('basic_auth');
     $basic_auth_allowed = \Drupal::config('govdelivery_bulletins.settings')->get('api_queue_trigger_allow_basic_auth');
     if ($basic_auth_enabled && $basic_auth_allowed) {
       // Make all routes at api/govdelivery_bulletins/queue* accessible to any
