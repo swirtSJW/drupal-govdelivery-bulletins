@@ -597,7 +597,7 @@ class AddBulletinToQueue {
     if ($this->flag_test === TRUE) {
       // This is a test, so proceed with validation.
       // email_addresses must be an array and have at least one value.
-      if (count($this->emailAddresses < 1)) {
+      if (count($this->emailAddresses) < 1) {
         $error_messages[] = t('Can not send a test bulletin without at least one address to send it to.');
       }
       // Check that each item is an email address.
