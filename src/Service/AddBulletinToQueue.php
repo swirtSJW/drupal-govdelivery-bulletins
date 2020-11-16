@@ -340,7 +340,7 @@ class AddBulletinToQueue {
       $queued_bulletins_to_release = [];
       for ($i = 0; $i < $item_count; $i++) {
         // Get a queued item
-        $queued_bulletin = $queue->claimItem(0);
+        $queued_bulletin = $queue->claimItem();
         if ($queued_bulletin) {
           try {
             // Process it
