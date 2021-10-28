@@ -6,11 +6,11 @@
  */
 
 /**
- *  Implements hook_uninstall().
+ * Implements hook_uninstall().
  */
 function govdelivery_bulletins_uninstall() {
   $database = \Drupal::database();
   $query = $database->delete('queue')
-  ->condition('name', 'govdelivery_bulletins')
-  ->execute();
+    ->condition('name', 'govdelivery_bulletins')
+    ->execute();
 }

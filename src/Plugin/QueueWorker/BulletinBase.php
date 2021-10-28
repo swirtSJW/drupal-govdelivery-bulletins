@@ -48,7 +48,7 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
   /**
    * Processes the bulletins in the queue.
    *
-   * @param DateTime $end_time
+   * @param \DateTime|null $end_time
    *   The timestamp (optional) to use for grabbing items created prior.
    */
   public function processQueue($end_time = NULL) {
@@ -66,7 +66,8 @@ class BulletinBase extends QueueWorkerBase implements ContainerFactoryPluginInte
 
     for ($i = 0; $i < $number_of_queue; $i++) {
       // Get a queued item.
-      // @TODO the release time should be close to the timeout time on the govdelivery API.
+      // @todo the release time should be close to the timeout time on the
+      // govdelivery API.
       $item = $queue->claimItem(20);
       if ((!empty($item)) && (($end_time && $item->created < $end_time) || empty($end_time))) {
         // Now process individual bulletin.

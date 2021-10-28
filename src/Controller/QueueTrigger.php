@@ -47,4 +47,3 @@ class QueueTrigger extends ControllerBase {
   }
 
 }
-

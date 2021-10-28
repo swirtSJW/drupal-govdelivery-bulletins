@@ -3,6 +3,7 @@
 namespace Drupal\govdelivery_bulletins\Service;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Queue\SuspendQueueException;
 
 /**
@@ -16,14 +17,14 @@ class AddBulletinToQueue {
    *
    * @var bool
    */
-  private $flag_dedupe = FALSE;
+  private $flagDedupe = FALSE;
 
   /**
    * Flag to do this bulletin as a GovDelivery Test.
    *
    * @var bool
    */
-  private $flag_test = FALSE;
+  private $flagTest = FALSE;
 
   // Queue Operation variables.
   /**
@@ -49,7 +50,7 @@ class AddBulletinToQueue {
   /**
    * The timestamp of the queue item being added, used for processing the queue.
    *
-   * @var DateTime
+   * @var \DateTime
    */
   private $time = NULL;
 
@@ -101,7 +102,8 @@ class AddBulletinToQueue {
 
   /**
    * The time that the bulletin should be sent if not sending immediately.
-   * @var DateTime
+   *
+   * @var \DateTime
    */
   private $sendTime = NULL;
 
@@ -120,7 +122,7 @@ class AddBulletinToQueue {
   private $subject = NULL;
 
   /**
-   *  Topics to be included in the send.
+   * Topics to be included in the send.
    *
    * @var array
    */
@@ -132,28 +134,28 @@ class AddBulletinToQueue {
    *
    * @var bool
    */
-  private $click_tracking = FALSE;
+  private $clickTracking = FALSE;
 
   /**
    * Enable open tracking on the bulletin email.
    *
    * @var bool
    */
-  private $open_tracking = FALSE;
+  private $openTracking = FALSE;
 
   /**
    * Enable to publish the bulletin to the account activity RSS feed.
    *
    * @var bool
    */
-  private $publish_rss = FALSE;
+  private $publishRss = FALSE;
 
   /**
    * Enable to share the content to Facebook or Twitter.
    *
    * @var bool
    */
-  private $share_content_enabled = FALSE;
+  private $shareContentLabled = FALSE;
 
   /**
    * Enable to ignore the users' digest settings and send it immediately.
@@ -165,7 +167,7 @@ class AddBulletinToQueue {
   /**
    * The queue object.
    *
-   * @var \Drupal\QueueInterface
+   * @var \Drupal\Core\Queue\QueueInterface
    */
   private $queue = NULL;
 
@@ -190,7 +192,6 @@ class AddBulletinToQueue {
     }
     return $this;
   }
-
 
   /**
    * Adds an email address  to the email_addresses array.
@@ -244,10 +245,10 @@ class AddBulletinToQueue {
   /**
    * Adds the bulletin the to the Drupal Queue.
    *
-   * @param DateTime $time
+   * @param \DateTime $time
    *   The timestamp (optional) of when the queue item is to be actionalble.
    */
-  public function addToQueue($time = NULL) {
+  public function addToQueue(\DateTime $time = NULL) {
     $this->time = $time ?? time();
     $can_be_queued = \Drupal::config('govdelivery_bulletins.settings')->get('enable_bulletin_queuing');
     if ($can_be_queued) {
@@ -262,18 +263,18 @@ class AddBulletinToQueue {
     }
   }
 
-/**
- * Builds the queue item to be added.
- *
- * @return object
- *   The data that will be added to the queue.
- */
+  /**
+   * Builds the queue item to be added.
+   *
+   * @return object
+   *   The data that will be added to the queue.
+   */
   private function buildBulletinData() {
     $data = new \stdClass();
     // The $queue_uid can be used for deduping.
     $data->qid = $this->queueUid;
     // Needed so that the queue worker could only process tests or non-tests.
-    $data->test = $this->flag_test;
+    $data->test = $this->flagTest;
     $data->time = $this->time;
     $data->xml = $this->buildXml();
 
@@ -298,20 +299,20 @@ class AddBulletinToQueue {
       ];
       $xml = (string) twig_render_template(drupal_get_path('module', 'govdelivery_bulletins') . '/templates/govdelivery-bulletin-test-xml.html.twig', $template_variables);
     }
-    elseif (!$this->flag_test && $this->validate($error_messages)) {
+    elseif (!$this->flagTest && $this->validate($error_messages)) {
       // This is not a test and is valid.
       $this->dedupeQueue();
       $template_variables = [
         'body' => $this->body,
         'categories' => $this->categories,
-        'click_tracking' => $this->click_tracking,
+        'click_tracking' => $this->clickTracking,
         'footer' => $this->footer,
         'from_address' => $this->fromAddress,
         'header' => $this->header,
-        'open_tracking' => $this->open_tracking,
-        'publish_rss' => $this->publish_rss,
+        'open_tracking' => $this->openTracking,
+        'publish_rss' => $this->publishRss,
         'send_time' => $this->sendTime,
-        'share_content_enabled' => $this->share_content_enabled,
+        'share_content_enabled' => $this->shareContentLabled,
         'sms_body' => $this->smsBody,
         'subject' => $this->subject,
         'topics' => $this->topics,
@@ -321,7 +322,7 @@ class AddBulletinToQueue {
     }
     else {
       // Nothing validated so log and throw an exception with $error_messages.
-      // @TODO finish this.
+      // @todo finish this.
     }
 
     return $xml;
@@ -331,7 +332,7 @@ class AddBulletinToQueue {
    * Remove any queued items with the same $queue_uid as this one.
    */
   private function dedupeQueue() {
-    if ($this->flag_dedupe === TRUE) {
+    if ($this->flagDedupe === TRUE) {
       $queue = $this->getQueue();
       $item_count = $queue->numberOfItems();
       $removed_count = 0;
@@ -339,7 +340,7 @@ class AddBulletinToQueue {
       // we need to grab them all and mass release them.
       $queued_bulletins_to_release = [];
       for ($i = 0; $i < $item_count; $i++) {
-        // Get a queued item
+        // Get a queued item.
         $queued_bulletin = $queue->claimItem();
         if ($queued_bulletin) {
           try {
@@ -354,10 +355,11 @@ class AddBulletinToQueue {
               // It is not a duplicate, so release it back into the queue.
               $queued_bulletins_to_release[$queued_bulletin->item_id] = $queued_bulletin;
             }
-          } catch (SuspendQueueException $e) {
+          }
+          catch (SuspendQueueException $e) {
             // If there was an Exception thrown because of an error
-            // Releases the item that the worker could not process.
-            // Another worker can come and process it
+            // release the item that the worker could not process.
+            // Another worker can come and process it.
             $queued_bulletins_to_release[$queued_bulletin->item_id] = $queued_bulletin;
             continue;
           }
@@ -370,7 +372,6 @@ class AddBulletinToQueue {
       }
     }
   }
-
 
   /**
    * Obtain the type of message requested.
@@ -393,6 +394,12 @@ class AddBulletinToQueue {
     return $messages;
   }
 
+  /**
+   * Gets the Queue.
+   *
+   * @return \Drupal\Core\Queue\QueueInterface
+   *   The queue interface.
+   */
   private function getQueue() {
     if (empty($this->queue)) {
       // Load the queue.
@@ -416,7 +423,6 @@ class AddBulletinToQueue {
     $this->body = $body;
     return $this;
   }
-
 
   /**
    * Sets a non-XML flag to the value specified.
@@ -493,12 +499,12 @@ class AddBulletinToQueue {
   /**
    * Setter for send_time, determines when GovDelivery will send the bulletin.
    *
-   * @param Datetime $send_time
+   * @param \DateTime $send_time
    *   The timestamp for when govDelivery will send the bulletin.
    *
    * @return $this
    */
-  public function setSendTime(\Datetime $send_time) {
+  public function setSendTime(\DateTime $send_time) {
     $this->sendTime = $send_time;
     return $this;
   }
@@ -551,7 +557,7 @@ class AddBulletinToQueue {
    *
    * @return $this
    */
-  public function setXmlBool (string $flag, bool $value = FALSE) {
+  public function setXmlBool(string $flag, bool $value = FALSE) {
     if (property_exists($this, $flag)) {
       $this->$flag = $value;
     }
@@ -569,7 +575,8 @@ class AddBulletinToQueue {
    *   An empty array passed by reference so the error messages can be handled
    *   by the caller.
    *
-   *   @return bool
+   * @return bool
+   *   TRUE if valid. FALSE otherwise.
    */
   private function validate(array &$error_messages) {
     // Length validation trigger a warning in the setter, but are valid.
@@ -582,7 +589,6 @@ class AddBulletinToQueue {
     return TRUE;
   }
 
-
   /**
    * Validate the xml data for the bulletin test template.
    *
@@ -590,11 +596,12 @@ class AddBulletinToQueue {
    *   An empty array passed by reference so the error messages can be handled
    *   by the caller.
    *
-   *   @return $this
+   * @return bool
+   *   TRUE if valid, FALSE otherwise.
    */
-  private function validateTest(&$error_messages) {
+  private function validateTest(array &$error_messages) {
     $return = FALSE;
-    if ($this->flag_test === TRUE) {
+    if ($this->flagTest === TRUE) {
       // This is a test, so proceed with validation.
       // email_addresses must be an array and have at least one value.
       if (count($this->emailAddresses) < 1) {
@@ -613,7 +620,6 @@ class AddBulletinToQueue {
     return $return;
   }
 
-
   /**
    * Displays the messages of a given type for drupal status.
    *
@@ -629,17 +635,25 @@ class AddBulletinToQueue {
    *
    * @param string $message
    *   The message to the watchdog log.
+   * @param array $variables
+   *   Message variables.
    */
-  private function log($message, $variables = []) {
+  private function log($message, array $variables = []) {
     \Drupal::logger('govdelivery_bulletins')->notice($message, $variables);
   }
 
   /**
-   * @deprecated Left here just to keep from causing fatal errors.
+   * This no longer does anything.
+   *
+   * @deprecated in govdelivery_bulletins:8.x-1.0 and is removed from govdelivery_bulletins:8.x-2.0
+   *   This was initially available and may be in use. Left here just to keep
+   *   from causing fatal errors.
+   * @see https://www.drupal.org/project/govdelivery_bulletins/issues/3246327
    */
   public function setGovDeliveryID($unique_id) {
     // This is deprecated, do nothing but log it.
     $this->log('AddBulletinToQueue->setGovDeliveryID is deprecated.  Please remove any calls to it.');
     return $this;
   }
+
 }

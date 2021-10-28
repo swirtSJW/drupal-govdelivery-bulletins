@@ -1,6 +1,7 @@
 # GovDelivery Bulletins
 
-This module is used to interact with the Granicus GovDelivery Bulletins API to send bulletins.
+This module is used to interact with the Granicus GovDelivery Bulletins API to
+send bulletins.
 
 
 ## How to use the service to add a bulletin to the queue.

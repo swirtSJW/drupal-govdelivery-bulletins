@@ -6,7 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class GovDeliveryBulletinsAdminForm.
+ * Class GovDeliveryBulletinsAdminForm is used for the module settings.
  */
 class GovDeliveryBulletinsAdminForm extends FormBase {
 

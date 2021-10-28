@@ -42,7 +42,7 @@ class SendBulletin {
    *
    * @var string
    */
-  private $username= NULL;
+  private $username = NULL;
 
   /**
    * SendBulletin constructor.
@@ -60,7 +60,6 @@ class SendBulletin {
    *
    * @param string $xml
    *   Properly formed XML required by the GovDelivery Bulletin API.
-   *
    * @param int $item_id
    *   The item ID of the queued item being sent.
    *
@@ -104,8 +103,8 @@ class SendBulletin {
           watchdog_exception('govdelivery_bulletins', $e);
         }
       }
-        // Can't send, due to lack of credentials, already logged.
-        return FALSE;
+      // Can't send, due to lack of credentials, already logged.
+      return FALSE;
     }
     else {
       // Sending is not enabled, log it only.
@@ -165,9 +164,9 @@ class SendBulletin {
       $is_valid = FALSE;
       \Drupal::logger('govdelivery_bulletins')->error('Could not send XML to GovDelivery endpoint, XML was empty.');
     }
-    // @TODO Run additional check to check for valid xml.
+    // @todo Run additional check to check for valid xml.
     // Maybe like https://magp.ie/2011/02/12/check-for-valid-xml-with-php this.
-
     return $is_valid;
   }
+
 }
