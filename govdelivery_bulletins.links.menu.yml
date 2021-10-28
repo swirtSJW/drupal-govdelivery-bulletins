@@ -1,5 +1,17 @@
-govdelivery_bulletins.config_page:
-  title: 'GovDelivery Bulletins'
-  description: 'GovDelivery Bulletins settings .'
+govdelivery_bulletins.admin_home:
+  title: GovDelivery Bulletins
+  description: 'GovDelivery Bulletins Administration.'
+  route_name: govdelivery_bulletins.admin_home
   parent: system.admin_config_services
+govdelivery_bulletins.config_page:
+  title: 'Settings'
+  description: 'GovDelivery Bulletins settings.'
+  parent: govdelivery_bulletins.admin_home
   route_name: govdelivery_bulletins.govdelivery_bulletins_admin_form
+  weight: 5
+govdelivery_bulletins.admin_queue:
+  title: 'Queue'
+  description: 'Review and process GovDelivery Bulletins Queue on demand.'
+  route_name: govdelivery_bulletins.admin_queue
+  parent: govdelivery_bulletins.admin_home
+  weight: 10

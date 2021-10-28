@@ -60,6 +60,6 @@ $apiUsername = $config->get('govdelivery_username');
 $apiPassword = $config->get('govdelivery_password');
 
 ```
-You can also save your username and password by setting them in the [GovDelivery Bulletins Admin form](/admin/config/services/govdelivery_bulletins).
+You can also save your username and password by setting them in the [GovDelivery Bulletins Admin form](/admin/config/services/govdelivery-bulletins/settings).
 
 This is strongly discouraged, and presents a security vulnerability.
