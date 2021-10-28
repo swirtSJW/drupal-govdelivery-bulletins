@@ -17,14 +17,14 @@ class AddBulletinToQueue {
    *
    * @var bool
    */
-  private $flagDedupe = FALSE;
+  private $flag_dedupe = FALSE;
 
   /**
    * Flag to do this bulletin as a GovDelivery Test.
    *
    * @var bool
    */
-  private $flagTest = FALSE;
+  private $flag_test = FALSE;
 
   // Queue Operation variables.
   /**
@@ -134,28 +134,28 @@ class AddBulletinToQueue {
    *
    * @var bool
    */
-  private $clickTracking = FALSE;
+  private $click_tracking = FALSE;
 
   /**
    * Enable open tracking on the bulletin email.
    *
    * @var bool
    */
-  private $openTracking = FALSE;
+  private $open_tracking = FALSE;
 
   /**
    * Enable to publish the bulletin to the account activity RSS feed.
    *
    * @var bool
    */
-  private $publishRss = FALSE;
+  private $publish_rss = FALSE;
 
   /**
    * Enable to share the content to Facebook or Twitter.
    *
    * @var bool
    */
-  private $shareContentLabled = FALSE;
+  private $share_content_enabled = FALSE;
 
   /**
    * Enable to ignore the users' digest settings and send it immediately.
@@ -245,10 +245,10 @@ class AddBulletinToQueue {
   /**
    * Adds the bulletin the to the Drupal Queue.
    *
-   * @param \DateTime $time
+   * @param \DateTime|null $time
    *   The timestamp (optional) of when the queue item is to be actionalble.
    */
-  public function addToQueue(\DateTime $time = NULL) {
+  public function addToQueue($time = NULL) {
     $this->time = $time ?? time();
     $can_be_queued = \Drupal::config('govdelivery_bulletins.settings')->get('enable_bulletin_queuing');
     if ($can_be_queued) {
@@ -274,7 +274,7 @@ class AddBulletinToQueue {
     // The $queue_uid can be used for deduping.
     $data->qid = $this->queueUid;
     // Needed so that the queue worker could only process tests or non-tests.
-    $data->test = $this->flagTest;
+    $data->test = $this->flag_test;
     $data->time = $this->time;
     $data->xml = $this->buildXml();
 
@@ -299,20 +299,20 @@ class AddBulletinToQueue {
       ];
       $xml = (string) twig_render_template(drupal_get_path('module', 'govdelivery_bulletins') . '/templates/govdelivery-bulletin-test-xml.html.twig', $template_variables);
     }
-    elseif (!$this->flagTest && $this->validate($error_messages)) {
+    elseif (!$this->flag_test && $this->validate($error_messages)) {
       // This is not a test and is valid.
       $this->dedupeQueue();
       $template_variables = [
         'body' => $this->body,
         'categories' => $this->categories,
-        'click_tracking' => $this->clickTracking,
+        'click_tracking' => $this->click_tracking,
         'footer' => $this->footer,
         'from_address' => $this->fromAddress,
         'header' => $this->header,
-        'open_tracking' => $this->openTracking,
-        'publish_rss' => $this->publishRss,
+        'open_tracking' => $this->open_tracking,
+        'publish_rss' => $this->publish_rss,
         'send_time' => $this->sendTime,
-        'share_content_enabled' => $this->shareContentLabled,
+        'share_content_enabled' => $this->share_content_enabled,
         'sms_body' => $this->smsBody,
         'subject' => $this->subject,
         'topics' => $this->topics,
@@ -332,7 +332,7 @@ class AddBulletinToQueue {
    * Remove any queued items with the same $queue_uid as this one.
    */
   private function dedupeQueue() {
-    if ($this->flagDedupe === TRUE) {
+    if ($this->flag_dedupe === TRUE) {
       $queue = $this->getQueue();
       $item_count = $queue->numberOfItems();
       $removed_count = 0;
@@ -601,7 +601,7 @@ class AddBulletinToQueue {
    */
   private function validateTest(array &$error_messages) {
     $return = FALSE;
-    if ($this->flagTest === TRUE) {
+    if ($this->flag_test === TRUE) {
       // This is a test, so proceed with validation.
       // email_addresses must be an array and have at least one value.
       if (count($this->emailAddresses) < 1) {
