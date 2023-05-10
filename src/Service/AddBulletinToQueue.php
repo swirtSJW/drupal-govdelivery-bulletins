@@ -297,7 +297,7 @@ class AddBulletinToQueue {
       $template_variables = [
         'email_addresses' => $this->emailAddresses,
       ];
-      $xml = (string) twig_render_template(drupal_get_path('module', 'govdelivery_bulletins') . '/templates/govdelivery-bulletin-test-xml.html.twig', $template_variables);
+      $xml = (string) twig_render_template(\Drupal::service('extension.list.module')->getPath('govdelivery_bulletins') . '/templates/govdelivery-bulletin-test-xml.html.twig', $template_variables);
     }
     elseif (!$this->flag_test && $this->validate($error_messages)) {
       // This is not a test and is valid.
@@ -318,7 +318,7 @@ class AddBulletinToQueue {
         'topics' => $this->topics,
         'urgent' => $this->urgent,
       ];
-      $xml = (string) twig_render_template(drupal_get_path('module', 'govdelivery_bulletins') . '/templates/govdelivery-bulletin-xml.html.twig', $template_variables);
+      $xml = (string) twig_render_template(\Drupal::service('extension.list.module')->getPath('govdelivery_bulletins') . '/templates/govdelivery-bulletin-xml.html.twig', $template_variables);
     }
     else {
       // Nothing validated so log and throw an exception with $error_messages.
