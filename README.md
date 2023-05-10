@@ -1,7 +1,10 @@
 # GovDelivery Bulletins
 
-This module is used to interact with the Granicus GovDelivery Bulletins API to
-send bulletins.
+This module provides a set of utilities to have your Drupal powered site use [GovDelivery's Communications Cloud API - Bulletins resource](https://developer.govdelivery.com/api/comm_cloud_v1/Default.htm#API/Comm%20Cloud%20V1/API_CommCloudV1_Bulletins.htm) to create and send Bulletin notifications including an external trigger endpoint.  This module supports custom code a developer must create to send the bulletin.  It does not create them by itself.
+
+It is more focused in function than the [GovDelivery Integration module](https://www.drupal.org/project/govdelivery).
+
+
 
 
 ## How to use the service to add a bulletin to the queue.
